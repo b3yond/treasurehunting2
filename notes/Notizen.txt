@@ -1,0 +1,462 @@
+# # # # #
+# TO-DO #
+# # # # #
+realise game in pySDL2
+enemy list system: import data from pickle file.
+document how enemy, mission, item, player data is packed.
+change player.bitcoins back to 50
+
+
+# Misc
+
+
+# Function flow
+
+create window
+main Menu
+character creation
+player.save_profile
+profile/computer
+    merchant
+    player.save_profile
+    level choice
+        build_battlefield
+        start_level
+            initiative
+                your_turn
+                    act
+                        walk
+                            test_new_level  # test: was a door accessed?
+                            test_item_found # test: was an item found?
+                        cast_spell      # write a spell
+                        melee_skill     # did you hit?
+                            melee_damage    # deal damage
+                        aim
+                            shoot
+                ai_turn
+                    state       # which action?
+                    act         # execute action
+                    player_seen # if player sees action, animation
+            dead    # did someone die?
+    player.save_profile
+
+
+main_menu_sdl
+    new_game_sdl
+    choose_game_sdl
+        profile_sdl
+            build_profile_sdl
+            merchant_sdl
+                buy_gun_sdl
+                buy_sword_sdl
+            choose_mission
+            run_mission
+                run_room
+                    display_fields
+
+
+
+# Classes
+
+Individuum
+    Vampire
+    Werewolf
+    Angel
+    Golem
+
+Enemy
+
+Item
+    Swords
+    Guns
+    Upgrades  # to do
+
+Spell?
+
+
+Room
+    id          # integer, must be unique
+    fields      # list of lists
+    field data  # dictionary for field data
+    description # string - necessary?
+
+Mission
+    successfunc # function to check if mission is accomplished - several templates
+    rewardmoney # integer
+    rewarditems # list of Item-objects
+    rewardxp    # integer
+    description # string
+    room        # Room-object where to start
+    current_room# Room which is currently loaded
+    success     # dict of booleans
+
+Panel(sdl2.ext.Entity)
+    displays an image
+
+TextSprite(sdl2.ext.TextureSprite)
+    displays text
+
+SDLInstanceManager
+    contains all the pySDL2-instances.
+
+ConsoleScreen
+    displays console and tooltips
+
+Charwindow
+    displays char values, augs and inventory
+
+ItemButton
+    displays an item panel and button
+
+
+
+# Mission Success Conditions
+
+target_item_owned - string
+at_position - list[int, int, int(roomID)]
+target_enemy - integer (how many left?)
+
+
+
+# Races
+
+Human
+Angel
+Vampire
+Werewolf
+Golem
+
+# Attributes:
+
+Constitution
+Agility
+Strength
+Mobility
+Intelligence
+
+They could be ordered as a pentagram.... two of them always add up do a value.
+        Int
+  Str___/_\___Con
+      \/   \/
+      /_\ /_\
+    Mob     Agi
+
+
+# Values:
+
+Health Points:  Con * 8 + Str * 5 + 10
+Initiative:     Mob * 3 + Int * 5 / 10
+Melee Hitting:  Agi * 3 + Str * 5
+Melee Defense:  Mob * 5 + Con * 3
+Range Hitting:  Agi * 7 + Int * 3
+Walk AP cost:   100 / Mob           # maybe we find a better algorithm for that
+
+
+
+# Initiative
+
+Every action costs AP. When a character acts, these costs are added on its Initiative Counter (IC).
+At the beginning of each turn it is checked who has the lowest IC.
+The character with the lowest IC can act now. After that action, the turn ends.
+If a new character comes into the level (e.g. conjuration), its IC is set equal to the lowest IC in the level.
+An Action costs: AP / Initiative of the Character.  # maybe we find a better algorithm for that
+
+
+
+# Fighting
+maybe we find better algorithms for that.
+
+Melee:
+Hitting: melee hitting(A) + random0-50 > melee defense(D) + random0-20
+Critchance: Sword.critical, if it crits, then damage * 2
+Damage: Str*5 + Weapon Damage
+
+Range:
+Hitting: random1-100 > 100 - range hitting(A)
+Damage: Waffe
+
+10% failchance at every test
+
+
+# Start Values per race
+
+Golem
+Con = 7
+Str = 8
+Agi = 4
+Mob = 4
+Int = 3
+
+Vampir
+Con = 5
+Str = 8
+Agi = 6
+Mob = 5
+Int = 5
+
+Mensch
+Con = 4
+Str = 5
+Agi = 5
+Mob = 4
+Int = 4
+
+Engel
+Kon = 4
+Str = 3
+Agi = 7
+Mob = 7
+Int = 5
+
+
+Werwolf
+Human Values*2
+Cant use weapons while turned
+turning costs: 130 AP
+
+
+# Augmentations
+
+There is a 10 percent chance that a surgery fails and your constitution is permanently reduced by 1.
+
+-----------------------------------------------------------------------
+artificial leg      | mobility + 2
+reflex chip         | 10 % Chance each turn, that IC is reduced by 10, checked at act function
+kevlar implant      | +20 max_HP, check at update_maxHP()
+eye processor       | agility + 2
+cosmetic surgery    | all costs -10 BTC, checked at buy_gun, buy_sword, augment function
+fear blocker        | Use guns in melee, checked at act function
+wallhack            | No hitting malus because of barricades
+genetic surgery     | Player can morph into a werewolf: double stats, dont use weapons while morphed
+learning software   | needed XP per level: -15, checked at levelup function
+blessed by luck     | chance tests += 0.05, checked at chance function?
+
+
+# Interface
+directory: panels2
+
+Panel Hierarchy: (horizontal x vertical / depth)
+root (800x600)
+    leftpanel (200x150/-20) - leftpanel.gif
+        charwin (180x130/-19) - charwinbackground.gif
+            Text? # - charwinexample.gif
+            racelogo
+                vamplogo.gif
+                ...
+    midpanel (300x150/-20) - rightmidpanel.gif
+        console(280x90/0) - consolebackground.gif
+            Text?
+        ActionButton (25x25)
+    rightpanel(300x150/-20) - rightmidpanel.gif
+        SpellButton (30x30) - spellbutton.gif
+        augmentations (30x90/-19) - augframe.gif
+            3 augmentations (30x30)
+        inventory (240x130/-19) - inventorybackground.gif
+            Item (25x25)
+                glock.gif
+                ...
+    highpanel(800x450/-20) - highpanel.gif
+        Fields (15x15)
+            0leer.gif
+            1one.gif
+            wall.gif
+            ...
+        TextPanel (var/20)
+        pentagram - TODO
+        emptyfields (800x450/0) - emptyfields.gif
+    InfoText (var/30) - black text, yellow/beige background, open by right click, close by click on it
+
+
+
+in Menu:
+-------------------------------------------------
+|                                               |
+|                    Menu                       |
+|                                               |
+|                  Choice1                      |
+|                  Choice2                      |
+|                  Choice3                      |
+|                  Choice4                      |
+|                  Choice5                      |
+|                  Choice6                      |
+|                                               |
+|------------------------------------------------
+| Charwin   | Go Back           |Aug1 Inventory |
+| ---       | ---               |Aug2 ---       |
+| ---       | ---               |Aug3 ---       |
+| ---       | Console           |Spel ---       |
+-------------------------------------------------
+If Character loaded, show Char Window, Inventory etc., even if you can't do stuff with it
+Click on Choice Option to go there
+Display Game Output in Console
+
+at Merchant:
+-------------------------------------------------
+|                                               |
+| Guns ---- Swords ---- Spells ---------- Aug-- |
+| --------- ----------- ----------------- ----- |
+| --------- ----------- ----------------- ----- |
+| --------- ----------- ----------------- ----- |
+| --------- ----------- ----------------- ----- |
+| --------- ----------- ----------------- ----- |
+| --------- ----------- ----------------- ----- |
+| --------- ----------- ----------------- ----- |
+|                                               |
+|------------------------------------------------
+| Charwin   | Go Back           |Deau Inventory |
+| ---       | ---               |gmen ---       |
+| ---       | ---               |t--- ---       |
+| ---       | Console           |Spel ---       |
+-------------------------------------------------
+
+right click on item: see values
+click on item: open dialog if you want to buy/sell, buy/sell
+click on Spel: show Spells
+Display Game Output in Console
+
+in Level:
+-------------------------------------------------
+|                                               |
+|       L                                       |
+|                                               |
+|              E                                |
+|                                               |
+|                     V                         |
+|                                               |
+|                            E                  |
+|                                               |
+|                                   L           |
+|------------------------------------------------
+| Charwin   | Action Buttons    |Aug1 Inventory |
+| ---       | ---               |Aug2 ---       |
+| ---       | ---               |Aug3 ---       |
+| ---       | Console           |Spel ---       |
+-------------------------------------------------
+arrow keys: walk
+click on action fields: choose to shoot, fight, morph, wait
+click on field: use action on field
+click on item in inventory: use/equip it
+click on Spel: show Spell Screen
+right click on field: view information
+right click on item: view information
+right click on spell word: view information
+hover over field: see AP costs
+Display Game Output in Console
+
+Skill Screen
+-------------------------------------------------
+|                                               |
+|                 Level up                      |
+|                                               |
+|                   Int                         |
+|           Con              Str                |
+|                (Pentagram)                    |
+|                                               |
+|               Mob      Agi                    |
+|                                               |
+|                                               |
+|------------------------------------------------
+| Charwin   | Confirm           |Aug1 Inventory |
+| ---       | ---               |Aug2 ---       |
+| ---       | ---               |Aug3 ---       |
+| ---       | Console           |Spel ---       |
+-------------------------------------------------
+click on Int etc: (Erase earlier Choice,) Skill up attribute and see values changing in Charwin
+click on Confirm: Save and return to Level screen (by destroying Levelupscreen)
+click on Spel: show Spells
+
+Cast Spell screen
+-------------------------------------------------
+|                                               |
+| Pro---- Eff---- Con--- Tar--- Int---- Oth---  |
+| ------- ------- ------ ------ ------- ------- |
+| ------- ------- ------ ------ ------- ------- |
+| ------- ------- ------ ------ ------- ------- |
+| ------- ------- ------ ------ ------- ------- |
+| ------- ------- ------ ------ ------- ------- |
+| ------- ------- ------ ------ ------- ------- |
+| ------- ------- ------ ------ ------- ------- |
+|                                               |
+|------------------------------------------------
+| Charwin   | Go Back           |Aug1 Inventory |
+| ---       | ---               |Aug2 ---       |
+| ---       | ---               |Aug3 ---       |
+| ---       | Console           |     ---       |
+-------------------------------------------------
+Click on Spell word: add it to spell (cast it)
+
+# How do important data structures look like?
+
+
+    fields      # list of lists
+    field data  # dictionary for field data
+    description # string - necessary?
+
+fields = [["W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W"],
+               ["W", "O", "O", "O", "T", "W", "W", "W", "W", "W", "W", "W", "W", "W", "O", "O", "O", "O", "O", "O", "W"],
+               ["W", "O", "O",  1 , "O", "W", "W", "W", "W", "W", "W", "W", "W", "W", "O",  4 , "O", "L", "O", "O", "W"],
+               ["W", "O",  1 , "O", "O", "W", "W", "W", "W", "W", "W", "W", "W", "W", "O", "O", "O", "W", "W", "W", "W"],
+               ["W", "O", "B", "B", "B", "W", "W", "W",  2 ,  2 , "W", "W", "W", "W", "O", "O", "O", "W", "W", "W", "W"],
+               ["W", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "W", "W", "W", "W"],
+               ["W", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O",  3 , "W", "W", "W"],
+               ["W", "O", "O", "O",  4 , "O", "O", "O", "O",  1 , "O",  1 , "O", "O", "O", "O", "O", "W", "W", "W", "W"],
+               ["W", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "W", "W", "W", "W"],
+               ["W", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "W"],
+               ["W", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O",  1 , "O", "O", "O",  1 , "O", "O", "O", "W"],
+               ["W", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "W"],
+               ["W", "B", "B", "B", "B", "B", "B", "B", "O", "O", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "W"],
+               ["W", "O", "O", "O", "O", "O",  1 , "O", "O", "O",  1 , "O", "O", "O", "O", "O", "O", "O", "O", "O", "W"],
+               ["W", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "W"],
+               ["W", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "W"],
+               ["W", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "W"],
+               ["W", "W",  0 , "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "W"],
+               ["W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W"]]
+
+fielddata = {
+    1:"Police Officer",     # all_enemies[enemy][0]
+    2:"15313123513210564",  # room.id
+    3:"13213543213151321",
+    4:"Angel",
+    "target":4  # you need to kill every angel to finish the mission
+}
+
+police = ["Police Officer", "human", "", 0, 0, 0, 0, 0, "glock", "teli", [5, 10], 5]
+
+all_enemies = {
+                "Police Officer": police,
+                "Private Security": security
+                }
+
+Mission:
+    success_func()        # function to check if mission is accomplished
+    rewardmoney = 200         # integer
+    rewarditems = ["Glock"]        # list of Item-objects
+    rewardxp = 25           # integer
+    description = "Kill the boss."        # string
+    room = Room()               # Room-object where to start
+    current_room = room       # Room where the player is
+    rooms = [room, Room(), Room()]              # list of Room objects
+    target_item = "Treasure"        # string (name of item) - default: None
+    target_enemy = 5       # integer (how many enemies have target attribute) - default: 0
+    target_coordinates = [23,12,15313123513210564]  # list (x,y,roomID) - default: None
+
+
+Player:
+    self.name = name
+    self.race = race
+    self.con = con  # Constitution, integer
+    self.str = str  # Strength, integer
+    self.agi = agi  # Agility, integer
+    self.mob = mob  # Mobility, integer
+    self.int = int  # Intelligence, integer
+    self.max_hp = self.con * 8 + self.str * 5 + 10  # integer
+    self.id = enemies.getenemyid()  # integer
+    self.hp = self.max_hp           # integer
+    self.ic = 0  # Initiative Counter, integer
+    self.inventory = []  # List of Objects
+    self.augmentations = []  # List of Strings
+    self.bitcoins = 150  # Integer
+    self.level = 1  # There is no max. level, I think
+    self.experience = 0  # set back to 0 when level increments in levelup()
+    self.gun = items.Gun("No gun", 0, "", 0, 0, 0)  # drawn gun
+    self.sword = items.Sword("Fist", 0, "", 50, 0.0, 0.3, 0, False)  # drawn sword

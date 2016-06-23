@@ -1,0 +1,97 @@
+# Magic
+
+There are a lot of words which can be used to describe a spell.
+These words are then interpreted by the computer, who creates an effect.
+
+A working spell has these components:
+
+Target
+Effect
+Intensity
+Condition
+Probability
+
+If the caster doesn't specify all criteria, the computer decides what exactly happens and how the rest is computed.
+Every spell also costs Mana Points, which are calculated out of the effect of the resulting spell.
+Every spell word costs as much APs, as much syllables it has.
+
+
+
+# Vocabulary
+
+other words:
+Not
+much
+few
+done! (0 AP)
+
+intensity words:
+much
+few
+wide
+one
+three
+five
+ten
+75
+50
+40
+20
+100
+1000
+full
+
+probability words:
+rarely, but
+sure
+often
+never (fuck yeah, double negation)
+
+target words:
+me
+human
+wolf
+angel
+vampire
+police
+people
+
+effect words:
+heal
+burn
+sleep
+stun
+damage
+siphon life
+death
+calm
+forget
+conjure
+morph/unmorph
+
+condition words:
+life
+melee
+stunned
+all
+
+# Grammar
+
+the order of the words has to be:
+probability effect condition target intensity done!
+
+other words have to be related to some of these, and then always have to be before their relation word.
+all human
+not me
+
+
+possible sentences are:
+
+sure burn all human much
+sleep three police three
+stun police melee
+
+wrong sentences are:
+
+human sleep     # before effect can only be a probability word, no target.
+much heal me    # much isn't a intensity word at that place and can't be related to heal.
