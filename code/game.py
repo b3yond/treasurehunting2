@@ -203,6 +203,10 @@ class Mission(object):
             if a == False:
                 return False
         print current
+        player.bitcoins += self.rewardmoney
+        player.experience += self.rewardxp
+        for i in self.rewarditems:
+            player.inventory.add(i)
         return True
 
     def item_owned(self, player):
@@ -249,11 +253,18 @@ class Panel(sdl2.ext.Entity):
 
 
 class TextSprite(sdl2.ext.TextureSprite):
+    """
+    font_cache: Dictionary { (font, fontsize) : TTF_OpenFont(font, fontsize) }
+    """
+    font_cache = {}
+
     def __init__(self, renderer, font=None, text="", fontsize=24,
                  textcolor=sdl2.pixels.SDL_Color(255, 255, 255),
                  background=sdl2.pixels.SDL_Color(30, 30, 30), depth=20):
         self.renderer = renderer.renderer
-        self.font = TTF_OpenFont(font, fontsize)
+        if (font, fontsize) not in self.font_cache:
+            self.font_cache[(font, fontsize)] = TTF_OpenFont(font, fontsize)
+        self.font = self.font_cache.get((font, fontsize))
         self._text = text
         self.fontsize = fontsize
         self.fontcolor = textcolor
@@ -557,7 +568,7 @@ def create_text(world, renderer, text, x, y, fontsize=24, depth=20,
     :param text: string
     :param x: integer, position
     :param y: integer, position
-    :return:
+    :return: Panel object
     """
     font = "/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Regular.ttf"
     sprite = TextSprite(renderer, font, text, fontsize=fontsize, background=background,
@@ -934,6 +945,9 @@ def profile_sdl(m, player):
                     widgetlist, m = build_profile_sdl(m, player)
                     m.charwin.process()
                     break
+                with open("../saves/" + player.name, mode='w') as file:
+                    pickle.dump(player, file)
+                m.console.push("Game Saved.")
                 running = False
                 break
         m.charwin.process()
@@ -1200,8 +1214,10 @@ def run_mission(m, player, mission):
     :param mission: Mission object
     :return: player
     """
+    print mission.description  # debug
     while not mission.success_func(player):
         player, mission = run_room(m, player, mission)
+    print player.bitcoins  # debug
     return player
 
 
@@ -1216,7 +1232,7 @@ def run_room(m, player, mission):
     running = True
     while running:
         widgetlist = display_fields(m, player, mission)
-        print "running"
+        # print "running"  # debug
         events = sdl2.ext.get_events()
         for event in events:
             m.uiprocessor.dispatch(m.world, event)

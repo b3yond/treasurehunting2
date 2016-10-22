@@ -690,12 +690,15 @@ def erase_fielddata_entry(room):
 
 
 def choose_target_enemy(room):
+    print "0: Abort"
     for i in room.fielddata:
-        print i, room.fielddata[i]
+        print i + ":", room.fielddata[i]
     choice = 0
     while choice == 0:
         try:
             choice = int(raw_input("Which enemy is to be killed? "))
+            if choice == 0:
+                return
         except ValueError:
             print("ERROR: Enter a number.")
             choice = 0
