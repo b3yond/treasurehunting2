@@ -1,6 +1,7 @@
 # # # # #
 # TO-DO #
 # # # # #
+create new mission for testing
 realise game in pySDL2
 enemy list system: import data from pickle file.
 document how enemy, mission, item, player data is packed.
@@ -8,7 +9,7 @@ change player.bitcoins back to 50
 
 
 # Misc
-
+why the fuck is fielddata in Missions test, Sewers empty? old editor version?
 
 # Function flow
 

@@ -1233,6 +1233,7 @@ def run_room(m, player, mission):
     while running:
         widgetlist = display_fields(m, player, mission)
         # print "running"  # debug
+        # print mission.current_room.fielddata  # debug
         events = sdl2.ext.get_events()
         for event in events:
             m.uiprocessor.dispatch(m.world, event)

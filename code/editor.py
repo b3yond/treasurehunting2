@@ -43,9 +43,14 @@ class RoomEditor(object):
     and can give certain fields other values, which go into Room.fielddata
     or it does when its ready >.<
     weird bug: Save&Quit doesnt close the window, but still returns a room object.
+
+    :todo übergebe room, nicht fields
     """
 
-    def __init__(self):
+    def __init__(self, fields=0):
+        """
+        :param fields: lists of lists 30x52
+        """
         self.chosen = "W"
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.connect("delete_event", self.delete_event)
@@ -55,12 +60,14 @@ class RoomEditor(object):
         self.box2 = gtk.HBox(False, 0)
         self.menubox = gtk.VBox(False, 0)
 
-        # initialise list of lists: fields, later argument to Room()
-        self.fields = []
-        for i in range(30):
-            self.fields.append([])
-            for j in range(52):
-                self.fields[i].append("O")
+        if fields != 0:
+            self.fields = fields
+        # if no fields given, initialise list of lists: fields, later argument to Room()
+        else:
+            for i in range(30):
+                self.fields.append([])
+                for j in range(52):
+                    self.fields[i].append("O")
         # initialize dictionary: fielddata, later argument to Room()
         self.fielddata = {}
         self.show_fields()
