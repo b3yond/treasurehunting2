@@ -39,3 +39,10 @@ images: here are all of the game graphics.
 missions: mission files
 saves: save files
 resources: here are enemies, guns and swords saved.
+
+# Setting up
+
+apt install libsdl2-dev
+apt install python
+apt install pypy
+Treasure Hunting runs with PySDL2. Install it: https://pysdl2.readthedocs.io/en/rel_0_9_4/install.html
